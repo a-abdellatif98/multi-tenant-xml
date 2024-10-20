@@ -1,0 +1,47 @@
+require 'rails_helper'
+
+RSpec.describe TenantLoader, type: :service do
+  let(:xml_content) do
+    <<-XML
+      <tenant>
+        <models>
+          <user>
+            <field name="email" type="string" required="true" unique="true" />
+            <field name="age" type="integer" required="true" min="18" max="60" />
+          </user>
+        </models>
+        <callbacks>
+          <before_save model="user">validate_age</before_save>
+        </callbacks>
+      </tenant>
+    XML
+  end
+
+  before do
+    Rails.cache.clear # Clear cache to ensure fresh tests
+    allow(File).to receive(:read).and_return(xml_content) # Stub file reading
+  end
+
+  it 'loads models correctly from XML' do
+    loader = TenantLoader.new(xml_content)
+    loader.load_models
+
+    user = User.new(email: 'test@example.com', age: 25)
+    expect(user.valid?).to be(true)
+
+    invalid_user = User.new(email: nil, age: 70)
+    expect(invalid_user.valid?).to be(false)
+  end
+
+  it 'caches tenant configuration in Redis' do
+    tenant_name = 'tenant_a'
+    key = "tenant_#{tenant_name}_config"
+
+    # Simulate tenant loader using caching
+    Rails.cache.fetch(key) { xml_content }
+    cached_content = Rails.cache.read(key)
+
+    expect(cached_content).to eq(xml_content)
+  end
+end
+

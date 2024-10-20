@@ -1,0 +1,12 @@
+<!-- config/tenants/tenant_a.xml -->
+<tenant>
+  <models>
+    <user>
+      <field name="email" type="string" required="true" unique="true" />
+      <field name="age" type="integer" required="true" min="18" max="60" />
+    </user>
+  </models>
+  <callbacks>
+    <before_save model="user">validate_age</before_save>
+  </callbacks>
+</tenant>
