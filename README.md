@@ -48,7 +48,7 @@ This is a Ruby on Rails-based multi-tenant application utilizing XML configurati
 1. Fork the repository.
 2. Create a new branch.
 3. Make your changes and commit.
-4. Submit a pull request.
+4. Submit a pull request.  
 
 ## License
 
